@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+if [ $EUID -eq 0 ]
+then
+    if [ "$1" == "--sys" ]
+    then
+        if ! [ -d /usr/bin/go-hello ]
+        then
+            mkdir -p /usr/bin/go-hello
+            cp ./binaries/hello /usr/bin/go-hello
+        else
+            cp ./binaries/hello /usr/bin/go-hello
+        fi
+    elif [ "$1" == "--usr" ]
+    then
+        if ! [ -d ${HOME}/bin/go-hello ]
+        then
+            mkdir -p ${HOME}/bin/go-hello
+            cp ./binaries/hello /usr/bin/go-hello
+        else
+            cp ./binaries/hello /usr/bin/go-hello
+        fi
+    fi
+elif [ $EUID -ge 1000 ]
+then
+    if [ -f /usr/bin/sudo ]
+    then
+        ami_sudo() {
+            groups ${USER} | grep -qi wheel || groups ${USER} | grep -qi sudo
+            return
+        }
+        if ami_sudo
+        then
+            if [ "$1" == "--sys" ]
+            then
+                if ! [ -d /usr/bin/go-hello ]
+                then
+                    sudo mkdir -p /usr/bin/go-hello
+                    sudo cp ./binaries/hello /usr/bin/go-hello
+                else
+                    sudo cp ./binaries/hello /usr/bin/go-hello
+                fi
+            elif [ "$1" == "--usr" ]
+            then
+                if ! [ -d ${HOME}/bin/go-hello ]
+                then
+                    mkdir -p ${HOME}/bin/go-hello
+                    cp ./binaries/hello ${HOME}/bin/go-hello
+                else
+                    cp ./binaries/hello ${HOME}/bin/go-hello
+                fi
+            fi
+        else
+            echo "${USER} does not have sudo permissions. Please contact your administrator."
+        fi
+    else
+        if [ "$1" == "--sys" ]
+        then
+            if ! [ -d /usr/bin/go-hello ]
+            then
+                mkdir -p /usr/bin/go-hello
+                cp ./binaries/hello /usr/bin/go-hello
+            else
+                cp ./binaries/hello /usr/bin/go-hello
+            fi
+        elif [ "$1" == "--usr" ]
+        then
+            if ! [ -d ${HOME}/bin/go-hello ]
+            then
+                mkdir -p ${HOME}/bin/go-hello
+                cp ./binaries/hello /usr/bin/go-hello
+            else
+                cp ./binaries/hello /usr/bin/go-hello
+            fi
+        fi
+    fi
+fi
